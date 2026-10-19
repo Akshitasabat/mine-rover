@@ -1,28 +1,53 @@
-import React, { useState } from 'react';
-import { Eye, Flame, UserCheck, ShieldAlert, Crosshair, Cpu, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Eye, UserCheck, Crosshair, Camera, Flame, ShieldAlert, Cpu } from 'lucide-react';
+import {
+  VIDEO_STREAM_URL,
+  fetchDetections,
+  THERMAL_VIDEO_STREAM_URL,
+  fetchThermalDetections
+} from '../services/videoService';
 
 export default function AiVisionWorkstation() {
-  const [visionMode, setVisionMode] = useState('thermal'); // 'thermal' | 'optical' | 'combined'
+  const [visionMode, setVisionMode] = useState('live_camera'); // 'live_camera' | 'thermal' | 'combined'
   const [showBoundingBox, setShowBoundingBox] = useState(true);
-  const [showThermalGrid, setShowThermalGrid] = useState(true);
 
-  // Simulated 32x24 MLX90640 thermal matrix values (768 cells sample preview)
-  const generateThermalGridData = () => {
-    const cells = [];
-    for (let r = 0; r < 12; r++) {
-      for (let c = 0; c < 16; c++) {
-        // High heat human body cluster around r: 4-7, c: 6-9
-        const isHumanCluster = r >= 4 && r <= 7 && c >= 6 && c <= 9;
-        const temp = isHumanCluster
-          ? Number((36.2 + Math.random() * 1.2).toFixed(1))
-          : Number((22.0 + Math.random() * 2.5).toFixed(1));
-        cells.push({ r, c, temp, isHumanCluster });
+  // Live RGB YOLOv6 Detection State from FastAPI /detections (CP PLUS)
+  const [detections, setDetections] = useState({
+    count: 0,
+    persons: []
+  });
+
+  // Live Thermal YOLOv6 Detection State from FastAPI /thermal/detections (MLX90640)
+  const [thermalDetections, setThermalDetections] = useState({
+    source: "MLX90640",
+    resolution: "32x24",
+    persons: 0,
+    detections: []
+  });
+
+  // Poll live RGB & Thermal detections from FastAPI backend every 400ms
+  useEffect(() => {
+    let isMounted = true;
+    const updateAllDetections = async () => {
+      const rgbData = await fetchDetections();
+      const thermalData = await fetchThermalDetections();
+      if (isMounted) {
+        setDetections(rgbData || { count: 0, persons: [] });
+        setThermalDetections(thermalData || { source: "MLX90640", resolution: "32x24", persons: 0, detections: [] });
       }
-    }
-    return cells;
-  };
+    };
 
-  const thermalMatrix = generateThermalGridData();
+    updateAllDetections();
+    const interval = setInterval(updateAllDetections, 400);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const thermalPersonCount = thermalDetections.persons || 0;
+  const isThermalLock = thermalPersonCount > 0;
 
   return (
     <section id="ai-vision" className="py-24 bg-parchment bg-newspaper-dots text-walnut-dark relative border-b-2 border-walnut">
@@ -33,33 +58,33 @@ export default function AiVisionWorkstation() {
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-bronze uppercase tracking-widest mb-2">
               <Eye className="w-4 h-4 text-walnut" />
-              <span>SECTION 06 — THERMAL & VISUAL AI HAZARD DETECTION</span>
+              <span>SECTION 06 — DUAL VISION: CP-E23A & MLX90640 THERMAL CAMERA</span>
             </div>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-walnut-dark tracking-tight">
-              THERMAL RECOGNITION & WORKER DETECTION
+              SUBTERRANEAN WORKER RECOGNITION
             </h2>
           </div>
           <p className="font-sans text-sm text-walnut/80 max-w-md">
-            MLX90640 32x24 Far-Infrared sensor array combined with edge YOLO vision models to identify trapped personnel through zero-visibility coal smoke.
+            Parallel stream processing of CP PLUS optical RTSP and MLX90640 MQTT thermal matrix with PyTorch YOLOv6 edge detection.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* LEFT: Vision Mode Controls & Detection Analytics */}
+          {/* LEFT: Vision Mode Controls & Human Detection Analytics */}
           <div className="lg:col-span-5 space-y-6">
             
             {/* Mode Selector Card */}
             <div className="bg-parchment-paper border border-walnut p-6">
               <span className="font-mono text-xs font-bold text-walnut/60 block mb-3 uppercase">
-                SENSOR MATRIX & FEED SELECTOR
+                CAMERA STREAM & THERMAL SELECTOR
               </span>
 
               <div className="space-y-2 mb-6">
                 {[
-                  { id: 'thermal', label: 'MLX90640 THERMAL HEATMAP', desc: 'Far-Infrared 32x24 Matrix Grid' },
-                  { id: 'optical', label: 'OPTICAL IR NIGHT-VISION', desc: 'HD Camera + High-Power IR LED Array' },
-                  { id: 'combined', label: 'AI FUSED OPTICAL & THERMAL', desc: 'Dual-Layer Overlay with YOLO Bounding' },
+                  { id: 'live_camera', label: 'CP-E23A LIVE RTSP CAMERA (YOLOv6)', desc: 'Real-time OpenCV Stream + YOLOv6-S Bounding' },
+                  { id: 'thermal', label: 'MLX90640 LIVE MQTT THERMAL (YOLOv6)', desc: 'Reconstructed 32x24 Heatmap via HiveMQ MQTT' },
+                  { id: 'combined', label: 'AI FUSED OPTICAL & THERMAL', desc: 'Dual-Layer Stream with Heat Signature Overlay' },
                 ].map((mode) => (
                   <button
                     key={mode.id}
@@ -87,128 +112,180 @@ export default function AiVisionWorkstation() {
                     className="accent-walnut w-4 h-4"
                   />
                 </label>
-
-                <label className="flex items-center justify-between cursor-pointer">
-                  <span>SHOW THERMAL MATRIX GRID</span>
-                  <input
-                    type="checkbox"
-                    checked={showThermalGrid}
-                    onChange={(e) => setShowThermalGrid(e.target.checked)}
-                    className="accent-walnut w-4 h-4"
-                  />
-                </label>
               </div>
             </div>
 
-            {/* AI Target Detection Summary Card */}
+            {/* AI Human Detection Summary Card */}
             <div className="bg-walnut text-parchment border-2 border-walnut p-6">
               <div className="flex items-center justify-between border-b border-bronze pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <UserCheck className="w-4 h-4 text-amber" />
-                  <span className="font-mono text-xs font-bold text-amber">TARGET DETECTED</span>
+                  <span className="font-mono text-xs font-bold text-amber">HUMAN DETECTION STATUS</span>
                 </div>
-                <span className="font-mono text-[10px] bg-amber text-walnut font-bold px-2 py-0.5">
-                  CONFIDENCE: 96.4%
+                <span className="font-mono text-[11px] bg-amber text-walnut font-bold px-2 py-0.5">
+                  Persons: {detections.count}
                 </span>
               </div>
 
-              <div className="space-y-2 font-mono text-xs mb-4">
+              {/* RGB CP PLUS Detection Details */}
+              <div className="space-y-3 font-mono text-xs mb-4">
+                <div className="text-[11px] text-amber font-bold uppercase tracking-wider border-b border-walnut-dark pb-1">
+                  CP PLUS Optical Camera
+                </div>
+                {detections.count > 0 ? (
+                  detections.persons.map((person, idx) => (
+                    <div key={idx} className="bg-walnut-dark p-2.5 border border-amber/40 rounded-sm">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-amber font-bold">Worker #{idx + 1}</span>
+                        <span className="text-emerald-400 font-bold">
+                          Confidence: {(person.confidence * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-[10px] text-parchment/60">
+                        <span>BBox:</span>
+                        <span className="text-parchment font-mono">
+                          [{person.bbox ? person.bbox.join(', ') : 'N/A'}]
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-2 text-center text-[11px] text-parchment/60 border border-dashed border-bronze/40">
+                    No RGB optical detection.
+                  </div>
+                )}
+              </div>
+
+              {/* Thermal MLX90640 Detection Details */}
+              <div className="space-y-3 font-mono text-xs mb-4 pt-2 border-t border-bronze/40">
+                <div className="flex justify-between items-center text-[11px] text-amber font-bold uppercase tracking-wider border-b border-walnut-dark pb-1">
+                  <span>MLX90640 THERMAL FEED — MQTT HIVEMQ</span>
+                  <span className={isThermalLock ? "text-emerald-400 font-bold" : "text-parchment/60"}>
+                    Thermal Lock: {isThermalLock ? "YES" : "NO"}
+                  </span>
+                </div>
+                <div className="flex justify-between text-[11px] font-mono">
+                  <span className="text-parchment/60">Persons:</span>
+                  <span className="text-amber font-bold">{thermalPersonCount}</span>
+                </div>
+
+                {isThermalLock ? (
+                  thermalDetections.detections.map((det, idx) => (
+                    <div key={idx} className="bg-walnut-dark p-2.5 border border-emerald-500/40 rounded-sm">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-emerald-400 font-bold">PERSON #{idx + 1}</span>
+                        <span className="text-emerald-400 font-bold">
+                          Confidence: {(det.confidence * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-[10px] text-parchment/60">
+                        <span>BBox:</span>
+                        <span className="text-parchment font-mono">
+                          [{det.bbox ? det.bbox.join(', ') : 'N/A'}]
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-2 text-center text-[11px] text-parchment/60 border border-dashed border-bronze/40">
+                    No thermal person detected.
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2 font-mono text-[11px] mb-4 text-parchment/80 border-t border-bronze/40 pt-3">
                 <div className="flex justify-between">
-                  <span className="text-parchment/60">TARGET CLASSIFICATION:</span>
-                  <span className="text-amber font-bold">TRAPPED MINER (PERSONNEL)</span>
+                  <span className="text-parchment/60">RGB RTSP SOURCE:</span>
+                  <span className="text-emerald-400">192.168.0.104:5543</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-parchment/60">THERMAL SIGNATURE:</span>
-                  <span className="text-emerald-400 font-bold">36.8 °C (HUMAN BODY ENVELOPE)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-parchment/60">TUNNEL LOCATION:</span>
-                  <span className="text-parchment">SECTION B-4 (142m DEPTH)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-parchment/60">VITAL SIGN STATUS:</span>
-                  <span className="text-amber font-bold">RESPIRATORY MOTION DETECTED</span>
+                  <span className="text-parchment/60">THERMAL MQTT BROKER:</span>
+                  <span className="text-amber">HiveMQ Cloud (mine-rover/thermal)</span>
                 </div>
               </div>
 
               <p className="font-sans text-xs text-parchment/80 bg-walnut-dark p-3 border border-bronze leading-normal">
-                Edge AI zero-cloud pipeline processed thermal array frame in 12.4ms. Rescue alert vector broadcast to Surface Station.
+                MLX90640 32x24 thermal matrix reconstructed live with Matplotlib and fed into YOLOv6 detector.
               </p>
             </div>
 
           </div>
 
-          {/* RIGHT: Thermal & Visual Viewport */}
+          {/* RIGHT: Live Camera & Thermal Viewport */}
           <div className="lg:col-span-7 bg-walnut-dark border-2 border-walnut p-6 text-parchment relative min-h-[480px] shadow-2xl flex flex-col justify-between">
             
             {/* Viewport Overlay Header */}
             <div className="flex items-center justify-between border-b border-bronze pb-3 font-mono text-xs text-amber">
               <div className="flex items-center gap-2">
-                <Crosshair className="w-4 h-4 text-amber animate-pulse" />
-                <span>THERMAL CAM FEED — MLX90640 (32x24)</span>
+                {visionMode === 'thermal' ? (
+                  <Flame className="w-4 h-4 text-amber animate-pulse" />
+                ) : (
+                  <Camera className="w-4 h-4 text-amber animate-pulse" />
+                )}
+                <span>
+                  {visionMode === 'thermal'
+                    ? 'MLX90640 THERMAL FEED — MQTT HIVEMQ'
+                    : 'CP-E23A LIVE FEED — 192.168.0.104:5543'}
+                </span>
               </div>
-              <span className="text-emerald-400">FPS: 28.5 | SIMULATED DEMO</span>
+              <span className="text-emerald-400">
+                {visionMode === 'thermal'
+                  ? (thermalDetections.yolo_status || 'YOLOv6: INFERENCE RUNNING')
+                  : 'YOLOv6-S ONLINE'}
+              </span>
             </div>
 
             {/* Viewport Screen */}
             <div className="relative my-6 aspect-video bg-black border border-bronze overflow-hidden flex items-center justify-center">
               
-              {/* Thermal Heatmap Matrix Grid Background */}
-              {(visionMode === 'thermal' || visionMode === 'combined') && (
-                <div className="absolute inset-0 grid grid-cols-16 grid-rows-12 gap-0.5 p-2 bg-walnut-dark">
-                  {thermalMatrix.map((cell, idx) => {
-                    let bg = '#1c130c';
-                    if (cell.isHumanCluster) {
-                      bg = cell.temp > 37.0 ? '#fee197' : '#b8755b';
-                    } else if (cell.temp > 24) {
-                      bg = '#4f3622';
-                    }
-                    return (
-                      <div
-                        key={idx}
-                        style={{ backgroundColor: bg }}
-                        className={`w-full h-full transition-colors duration-500 ${
-                          showThermalGrid ? 'border-[0.5px] border-bronze/30' : ''
-                        }`}
-                        title={`Temp: ${cell.temp}°C`}
-                      />
-                    );
-                  })}
-                </div>
+              {/* LIVE CP-E23A ANNOTATED CAMERA STREAM FROM FASTAPI */}
+              {visionMode === 'live_camera' && (
+                <img
+                  src={VIDEO_STREAM_URL}
+                  alt="CP-E23A Live YOLOv6 Stream"
+                  className="w-full h-full object-contain bg-black"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '';
+                  }}
+                />
               )}
 
-              {/* Optical Layer Simulation */}
-              {visionMode === 'optical' && (
-                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-black to-emerald-950/40 flex items-center justify-center p-8 text-center font-mono text-xs text-emerald-400">
-                  <div className="border border-emerald-500/40 p-6 bg-black/60 max-w-sm">
-                    <span className="block mb-2 font-bold">[IR NIGHT VISION ACTIVE]</span>
-                    <p className="text-[11px] text-emerald-300">
-                      High-intensity IR LED illumination penetrating tunnel soot. Optical edge camera detecting structural entry frame.
-                    </p>
-                  </div>
-                </div>
+              {/* LIVE MLX90640 MATPLOTLIB RECONSTRUCTED THERMAL STREAM FROM FASTAPI */}
+              {visionMode === 'thermal' && (
+                <img
+                  src={THERMAL_VIDEO_STREAM_URL}
+                  alt="MLX90640 Live Matplotlib Thermal Stream"
+                  className="w-full h-full object-contain bg-black"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '';
+                  }}
+                />
               )}
 
-              {/* AI Bounding Box Overlay on Target */}
-              {showBoundingBox && (visionMode === 'thermal' || visionMode === 'combined') && (
-                <div className="absolute top-[32%] left-[38%] w-36 h-32 border-2 border-amber bg-amber/10 flex flex-col justify-between p-2 shadow-[0_0_15px_rgba(254,225,151,0.5)] animate-pulse">
-                  <div className="flex items-center justify-between font-mono text-[9px] bg-walnut-dark text-amber px-1">
-                    <span>TARGET #1</span>
-                    <span>36.8°C</span>
+              {/* Combined Mode View */}
+              {visionMode === 'combined' && (
+                <div className="relative w-full h-full flex">
+                  <div className="w-1/2 h-full border-r border-bronze">
+                    <img
+                      src={VIDEO_STREAM_URL}
+                      alt="CP-E23A Live Stream"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-
-                  <div className="self-center">
-                    <Crosshair className="w-6 h-6 text-amber animate-spin" />
-                  </div>
-
-                  <div className="font-mono text-[8px] bg-walnut-dark text-emerald-400 px-1 text-center">
-                    HUMAN DETECTED 96.4%
+                  <div className="w-1/2 h-full">
+                    <img
+                      src={THERMAL_VIDEO_STREAM_URL}
+                      alt="Thermal Stream"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
               )}
 
               {/* Crosshair Overlay */}
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-30">
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-20">
                 <div className="w-full h-[1px] bg-amber" />
                 <div className="h-full w-[1px] bg-amber absolute" />
               </div>
@@ -216,9 +293,15 @@ export default function AiVisionWorkstation() {
 
             {/* Viewport Footer Data Bar */}
             <div className="grid grid-cols-3 gap-2 pt-3 border-t border-bronze font-mono text-[10px] text-parchment/70">
-              <div>HEATMAP RANGE: 20°C - 38°C</div>
-              <div className="text-center text-amber">EDGE AI INFERENCE: 12.4ms</div>
-              <div className="text-right">RESOLUTION: 768 INFRARED PIXELS</div>
+              <div>
+                {visionMode === 'thermal' ? 'SENSOR: MLX90640 (32x24)' : 'RTSP PATH: /live/channel0'}
+              </div>
+              <div className="text-center text-amber">
+                {visionMode === 'thermal'
+                  ? `Thermal Lock: ${isThermalLock ? 'YES' : 'NO'} | Persons: ${thermalPersonCount}`
+                  : `PERSONS DETECTED: ${detections.count}`}
+              </div>
+              <div className="text-right">YOLO WEIGHTS: yolov6s.pt</div>
             </div>
 
           </div>

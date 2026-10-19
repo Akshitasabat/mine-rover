@@ -1,6 +1,6 @@
 # BGY — Bhoomi Gat Yaan
 
-**BGY (Bhoomi Gat Yaan)** is an intelligent subterranean inspection and rescue rover platform designed to enter hazardous underground mining galleries before human rescue teams. Transmitting real-time multi-sensor telemetry over sub-GHz LoRa radio, BGY performs forward reconnaissance, detects toxic gas accumulation, monitors structural tremors, and assesses overall subterranean emergency risk.
+**BGY (Bhoomi Gat Yaan)** is an intelligent subterranean inspection and rescue rover platform designed to enter hazardous underground mining galleries before human rescue teams. Transmitting real-time multi-sensor telemetry over Wi-Fi mesh network, BGY performs forward reconnaissance, detects toxic gas accumulation, monitors structural tremors, and assesses overall subterranean emergency risk.
 
 ---
 
@@ -9,7 +9,7 @@
 ```
 ESP32 Sensors / Synthetic Telemetry
                  ↓
-          LoRa Radio Gateway
+          Wi-Fi Mesh Gateway
                  ↓
         SQL Database (SQLite / SQLAlchemy)
                  ↓
@@ -117,4 +117,4 @@ Deploy the `backend/` directory to any Python-compatible cloud host (Render, Rai
 
 ## 📡 Hardware Compatibility Note
 
-While the current dataset is synthetically generated for demonstration and model verification, the ML pipeline and API schema (`POST /api/sensors`) are identical to what ESP32 / LoRa gateway hardware transmits. ESP32 hardware telemetry can be routed directly into the same REST endpoint without re-architecting the ML models.
+While the current dataset is synthetically generated for demonstration and model verification, the ML pipeline and API schema (`POST /api/sensors`) are identical to what ESP32 / Wi-Fi Mesh gateway hardware transmits. ESP32 hardware telemetry can be routed directly into the same REST endpoint without re-architecting the ML models.

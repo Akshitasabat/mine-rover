@@ -25,8 +25,8 @@ const SPEC_SECTIONS = [
   {
     category: 'SUBTERRANEAN COMMUNICATIONS',
     specs: [
-      { name: 'LoRa Radio Transceiver', detail: 'Semtech SX1276 SPI Module (@ 868 MHz / 915 MHz ISM Frequency)' },
-      { name: 'Wireless Modulation', detail: 'LoRa Chirp Spread Spectrum (CSS), SF9, BW 125 kHz, CR 4/5' },
+      { name: 'Wi-Fi Mesh Transceiver', detail: 'High-Power Dual-Band 802.11s Wi-Fi Mesh Module (@ 2.4 GHz / 5.8 GHz)' },
+      { name: 'Wireless Modulation', detail: '802.11s Dynamic Multi-Hop Mesh Routing, WPA3 Encryption' },
       { name: 'Subterranean Line-of-Sight', detail: '1.8 km Tested Range through Dense Rock Tunnels' },
       { name: 'RF Output Power', detail: '+20 dBm (100 mW Transmit Power) with 5dBi High-Gain Dipole' },
     ]

@@ -10,7 +10,7 @@ const TACTICAL_MARKERS = [
     y: '48%',
     depth: '142 meters',
     status: 'INSPECTION ACTIVE',
-    details: 'Current position: Tunnel Junction B-4. Transmitting 10Hz telemetry via LoRa.'
+    details: 'Current position: Tunnel Junction B-4. Transmitting 10Hz telemetry via Wi-Fi Mesh.'
   },
   {
     id: 'worker-1',
@@ -45,12 +45,12 @@ const TACTICAL_MARKERS = [
   {
     id: 'repeater-node',
     type: 'repeater',
-    label: 'SURFACE LoRa GATEWAY',
+    label: 'SURFACE WI-FI MESH GATEWAY',
     x: '15%',
     y: '20%',
     depth: 'Surface Ground Level',
     status: 'ACTIVE GATEWAY 94%',
-    details: 'Sub-GHz receiver gateway forwarding packet streams to Surface Station Edge Computer.'
+    details: 'Wi-Fi Mesh receiver gateway forwarding packet streams to Surface Station Edge Computer.'
   }
 ];
 

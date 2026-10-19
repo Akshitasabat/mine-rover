@@ -21,7 +21,7 @@ export default function TelemetryWorkstation() {
 
   const [simulatedSpike, setSimulatedSpike] = useState(null);
 
-  // Streaming loop simulating real-time LoRa packet arrival every 2 seconds
+  // Streaming loop simulating real-time Wi-Fi Mesh packet arrival every 2 seconds
   useEffect(() => {
     if (!isStreaming) return;
 
@@ -291,8 +291,8 @@ export default function TelemetryWorkstation() {
                 <span className="text-emerald-400">{latest.voltage} V</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-parchment/60">LoRa RSSI:</span>
-                <span className="text-amber">-92 dBm (94%)</span>
+                <span className="text-parchment/60">Wi-Fi Mesh RSSI:</span>
+                <span className="text-amber">-68 dBm (94%)</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-parchment/60">CURRENT LOCATION:</span>
@@ -434,7 +434,7 @@ export default function TelemetryWorkstation() {
 
             <div className="flex items-center justify-end gap-2 text-parchment/60">
               <RefreshCw className={`w-3.5 h-3.5 text-amber ${isStreaming ? 'animate-spin' : ''}`} />
-              <span>PACKET FREQUENCY: 10 Hz SUB-GHZ LoRa</span>
+              <span>PACKET FREQUENCY: 10 Hz WI-FI MESH</span>
             </div>
           </div>
         </div>

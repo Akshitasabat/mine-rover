@@ -30,13 +30,13 @@ export const PIPELINE_NODES = [
     subtitle: 'On-Board Microcontroller Unit',
     category: 'Processing',
     status: 'ACTIVE',
-    summary: 'Real-time embedded controller executing high-frequency sensor acquisition, IMU fusion, and LoRa packet framing.',
+    summary: 'Real-time embedded controller executing high-frequency sensor acquisition, IMU fusion, and Wi-Fi Mesh packet framing.',
     details: {
       chipset: 'Espressif Systems ESP32-WROOM-32U',
       clock: '240 MHz Dual Core Tensilica LX6',
       memory: '520 KB SRAM / 4 MB Flash',
-      busInterfaces: 'I2C (0x68 MPU6050, 0x76 BME280, 0x33 MLX90640), SPI (LoRa SX1276), ADC (MQ-4, MQ-7)',
-      firmware: 'FreeRTOS Multi-Threaded Sensor Pipeline (Task0: Sensors, Task1: LoRa TX)'
+      busInterfaces: 'I2C (0x68 MPU6050, 0x76 BME280, 0x33 MLX90640), Wi-Fi Mesh Module, ADC (MQ-4, MQ-7)',
+      firmware: 'FreeRTOS Multi-Threaded Sensor Pipeline (Task0: Sensors, Task1: Wi-Fi Mesh TX)'
     },
     specs: [
       { label: 'I2C Clock Rate', value: '400 kHz' },
@@ -67,19 +67,19 @@ export const PIPELINE_NODES = [
     ]
   },
   {
-    id: 'lora',
+    id: 'wifi_mesh',
     step: '04',
-    title: 'LONG-RANGE RADIO (LoRa)',
-    subtitle: 'Sub-GHz Telemetry Link',
+    title: 'WI-FI MESH CONNECTIVITY',
+    subtitle: 'High-Throughput Subterranean Mesh',
     category: 'Communication',
     status: 'ACTIVE',
-    summary: 'Ultra-reliable sub-gigahertz wireless transmission engineered for rock-dense subterranean penetration without cell infrastructure.',
+    summary: 'Ultra-reliable multi-hop Wi-Fi mesh network engineered for rock-dense subterranean penetration without cell infrastructure.',
     details: {
-      transceiver: 'Semtech SX1276 LoRa Module',
-      frequency: '868 MHz / 915 MHz ISM Band',
+      transceiver: 'High-Power Wi-Fi Mesh Node Transceiver',
+      frequency: '2.4 GHz / 5.8 GHz Dual-Band Mesh',
       antenna: '5 dBi Subterranean High-Gain Dipole Antenna',
-      modulation: 'LoRa Chirp Spread Spectrum (CSS)',
-      bandwidth: '125 kHz | Spreading Factor SF9 | Coding Rate 4/5'
+      modulation: '802.11s Wi-Fi Mesh Protocol',
+      bandwidth: '20/40 MHz | Dynamic Multi-Hop Routing'
     },
     specs: [
       { label: 'Tx Power', value: '+20 dBm (100 mW)' },
@@ -97,7 +97,7 @@ export const PIPELINE_NODES = [
     status: 'ACTIVE',
     summary: 'Surface-level receiver gateway positioned at the mine shaft entry, receiving raw encrypted packets from subterranean rovers.',
     details: {
-      gateway: 'LoRa Concentrator Base Station with High-Gain Yagi Array',
+      gateway: 'Wi-Fi Mesh Concentrator Base Station with High-Gain Yagi Array',
       demodulation: 'Hardened ESP32 Gateway / USB-UART Serial Bridge to Edge Unit',
       powerSupply: 'Solar-Assisted Battery Backup Unit',
       integrity: 'CRC16 Packet Validation & Timestamp Alignment'
@@ -229,7 +229,7 @@ export const MOCK_HARDWARE_SPECS = [
   { group: 'ENVIRONMENTAL CLIMATE', item: 'Bosch BME280 (Barometric Pressure, Humidity, Temperature)' },
   { group: 'INERTIAL MEASUREMENT', item: 'InvenSense MPU6050 6-DOF Accelerometer & Gyroscope' },
   { group: 'THERMAL VISION GRID', item: 'Melexis MLX90640 32x24 IR Array (768 Thermal Data Points)' },
-  { group: 'SUB-GHZ TRANSCEIVER', item: 'Semtech SX1276 LoRa SPI Transceiver @ 868MHz / 915MHz' },
+  { group: 'SUBTERRANEAN CONNECTIVITY', item: 'High-Power Dual-Band Wi-Fi Mesh Transceiver @ 2.4GHz / 5.8GHz' },
   { group: 'SAFETY & EMERGENCY', item: 'High-Decibel Piezo Buzzer + High-Lumen Searchlight + Manual Kill Switch' },
 ];
 

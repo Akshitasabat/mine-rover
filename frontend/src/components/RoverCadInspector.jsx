@@ -7,11 +7,11 @@ const HARDWARE_COMPONENTS = [
     name: 'ESP32 DevKit MCU',
     x: '48%',
     y: '42%',
-    role: 'Central Processing & LoRa Telemetry Packets',
+    role: 'Central Processing & Wi-Fi Mesh Packets',
     voltage: '3.3V DC',
     bus: 'I2C, SPI, ADC',
-    pinout: 'GPIO 21 (SDA), GPIO 22 (SCL), GPIO 5 (SPI CS)',
-    description: 'Executes FreeRTOS tasks to sample gas sensors at 10Hz and compile binary telemetry packets for LoRa transmission.'
+    pinout: 'GPIO 21 (SDA), GPIO 22 (SCL), GPIO 5 (CS)',
+    description: 'Executes FreeRTOS tasks to sample gas sensors at 10Hz and compile binary telemetry packets for Wi-Fi Mesh transmission.'
   },
   {
     id: 'mq4',
@@ -69,15 +69,15 @@ const HARDWARE_COMPONENTS = [
     description: 'Captures 768 thermal data points to detect human body temperatures (36.5°C - 37.5°C) through dark smoke.'
   },
   {
-    id: 'lora',
-    name: 'SX1276 LoRa Module & Antenna',
+    id: 'wifi_mesh',
+    name: 'Wi-Fi Mesh Module & Antenna',
     x: '85%',
     y: '15%',
-    role: 'Sub-GHz Long-Range Radio Transmitter',
+    role: 'High-Power Subterranean Wi-Fi Mesh Node',
     voltage: '3.3V DC',
-    bus: 'SPI Bus (SCK, MISO, MOSI)',
-    pinout: 'NSS (GPIO 5), RST (GPIO 14), DIO0 (GPIO 2)',
-    description: 'Transmits telemetry packets over 868MHz/915MHz chirp spread spectrum for subterranean penetration.'
+    bus: 'High-Speed Wi-Fi Bus',
+    pinout: 'VCC, GND, TX, RX',
+    description: 'Transmits telemetry packets over 2.4GHz/5.8GHz dual-band Wi-Fi Mesh for subterranean penetration.'
   },
   {
     id: 'ina219',
@@ -143,7 +143,7 @@ export default function RoverCadInspector() {
                 </div>
                 <div>
                   <span className="text-walnut/60 block text-[10px]">OPERATING RANGE</span>
-                  <span className="font-bold text-walnut-dark">1.8 km LoRa</span>
+                  <span className="font-bold text-walnut-dark">1.8 km Wi-Fi Mesh</span>
                 </div>
                 <div>
                   <span className="text-walnut/60 block text-[10px]">POWER MONITOR</span>

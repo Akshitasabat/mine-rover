@@ -113,7 +113,7 @@ export default function Navbar({ activeSection, setActiveSection }) {
               : 'bg-black/50 border-white/20 text-parchment/80'
           }`}>
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className={isLightState ? 'text-[#4f3622] font-medium' : 'text-parchment/80'}>LoRa Link:</span>
+            <span className={isLightState ? 'text-[#4f3622] font-medium' : 'text-parchment/80'}>Wi-Fi Mesh Link:</span>
             <span className={isLightState ? 'text-[#1c130c] font-bold' : 'text-amber font-bold'}>94% ONLINE</span>
           </div>
 

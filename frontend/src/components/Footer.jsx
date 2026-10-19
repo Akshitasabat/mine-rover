@@ -27,12 +27,12 @@ export default function Footer({ scrollToSection }) {
             </div>
 
             <p className="font-sans text-xs text-parchment/70 max-w-md leading-relaxed">
-              An intelligent inspection rover designed to enter hazardous underground mines before human rescue teams. Transmitting real-time telemetry over sub-GHz LoRa radio to surface edge AI.
+              An intelligent inspection rover designed to enter hazardous underground mines before human rescue teams. Transmitting real-time telemetry over high-throughput Wi-Fi mesh network to surface edge AI.
             </p>
 
             <div className="flex items-center gap-3 font-mono text-[11px] text-parchment/60">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>SUBTERRANEAN LoRa LINK: ACTIVE (868/915 MHz)</span>
+              <span>SUBTERRANEAN WI-FI MESH LINK: ACTIVE (2.4/5.8 GHz)</span>
             </div>
           </div>
 

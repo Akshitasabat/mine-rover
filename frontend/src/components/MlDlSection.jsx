@@ -228,7 +228,7 @@ export default function MlDlSection() {
               </h3>
             </div>
             <span className="font-mono text-[10px] text-parchment/60 bg-walnut px-3 py-1 border border-bronze">
-              ESP32 / LORA COMPATIBLE SCHEMA
+              ESP32 / WI-FI MESH COMPATIBLE SCHEMA
             </span>
           </div>
 

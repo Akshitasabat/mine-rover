@@ -3,14 +3,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine, Base
-from .routes import sensors, predictions, models, reports
+from .routes import sensors, predictions, models, reports, video, thermal
+from .services.yolov6_service import camera_service
+from .services.thermal_service import thermal_service
 
 # Create DB tables if not present
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="BGY Subterranean Risk Prediction API",
-    description="Real PyTorch LSTM & Transformer Machine Learning Engine for BhoomiGatYaan Underground Mining Rover",
+    description="Real PyTorch LSTM, Transformer & YOLOv6 Machine Learning Engine for BhoomiGatYaan Underground Mining Rover",
     version="1.0.0"
 )
 
@@ -23,10 +25,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def startup_event():
+    camera_service.start()
+    thermal_service.start()
+
 app.include_router(sensors.router)
 app.include_router(predictions.router)
 app.include_router(models.router)
 app.include_router(reports.router)
+app.include_router(video.router)
+app.include_router(thermal.router)
 
 @app.get("/")
 def root():

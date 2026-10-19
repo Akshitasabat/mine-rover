@@ -155,7 +155,7 @@ export default function ArchitecturePipeline() {
                 <span>COMMUNICATION PARADIGM</span>
               </div>
               <p className="text-[11px] leading-relaxed text-parchment/70">
-                100% Subterranean LoRa packet transmission directly to surface station edge server. No cloud dependence ensures disaster continuity.
+                100% Subterranean Wi-Fi Mesh packet transmission directly to surface station edge server. No cloud dependence ensures disaster continuity.
               </p>
             </div>
           </div>
